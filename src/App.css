@@ -1,0 +1,7 @@
+.main-topbar-buffer {
+  height: 80px; /* Hoặc chiều cao tương ứng với TopBar của bạn */
+}
+.main-grid-item {
+  padding: 16px;
+  min-height: 80vh;
+}

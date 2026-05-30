@@ -1,0 +1,14 @@
+.login-register-container {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.login-register-paper {
+  padding: 30px;
+}
+
+.section-title {
+  text-align: center;
+  font-weight: 600 !important;
+}
