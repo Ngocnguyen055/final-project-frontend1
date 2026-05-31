@@ -7,12 +7,17 @@ import {
   Divider,
   Alert,
   Box,
-  Grid,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { fetchModelPost } from "../../lib/fetchModelData";
 import "./styles.css";
 
 function LoginRegister({ onLogin }) {
+  const navigate = useNavigate();
+
+  // Toggle between login and register view
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
+
   // Login state
   const [loginName, setLoginName] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -55,6 +60,9 @@ function LoginRegister({ onLogin }) {
 
       // Notify parent component
       onLogin(response.data);
+
+      // Navigate to the logged-in user's detail page
+      navigate(`/users/${response.data._id}`);
     } catch (error) {
       setLoginError(error.message || "Login failed. Please try again.");
     }
@@ -65,7 +73,6 @@ function LoginRegister({ onLogin }) {
     setRegError("");
     setRegSuccess("");
 
-    // Validate
     if (!regLoginName.trim()) {
       setRegError("Login name is required");
       return;
@@ -113,160 +120,192 @@ function LoginRegister({ onLogin }) {
     }
   };
 
+  // ==================== LOGIN VIEW ====================
+  if (!isRegisterMode) {
+    return (
+      <div className="login-register-container">
+        <Paper elevation={3} className="login-register-paper">
+          <Typography variant="h5" gutterBottom className="section-title">
+            🔐 Login
+          </Typography>
+          <Divider style={{ marginBottom: "20px" }} />
+
+          {loginError && (
+            <Alert severity="error" style={{ marginBottom: "15px" }}>
+              {loginError}
+            </Alert>
+          )}
+
+          <form onSubmit={handleLogin}>
+            <TextField
+              label="Login Name"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={loginName}
+              onChange={(e) => setLoginName(e.target.value)}
+              autoFocus
+            />
+            <TextField
+              label="Password"
+              variant="outlined"
+              type="password"
+              fullWidth
+              margin="normal"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              size="large"
+              style={{ marginTop: "15px" }}
+            >
+              Login
+            </Button>
+          </form>
+
+          <Box mt={3} textAlign="center">
+            <Typography variant="body2">
+              Don't have an account?{" "}
+              <Button
+                color="primary"
+                onClick={() => {
+                  setIsRegisterMode(true);
+                  setLoginError("");
+                }}
+              >
+                Register here
+              </Button>
+            </Typography>
+          </Box>
+        </Paper>
+      </div>
+    );
+  }
+
+  // ==================== REGISTER VIEW ====================
   return (
     <div className="login-register-container">
-      <Grid container spacing={4} justifyContent="center">
-        {/* LOGIN SECTION */}
-        <Grid item xs={12} md={5}>
-          <Paper elevation={3} className="login-register-paper">
-            <Typography variant="h5" gutterBottom className="section-title">
-              🔐 Login
-            </Typography>
-            <Divider style={{ marginBottom: "20px" }} />
+      <Paper elevation={3} className="login-register-paper">
+        <Typography variant="h5" gutterBottom className="section-title">
+          📝 Register New Account
+        </Typography>
+        <Divider style={{ marginBottom: "20px" }} />
 
-            {loginError && (
-              <Alert severity="error" style={{ marginBottom: "15px" }}>
-                {loginError}
-              </Alert>
-            )}
+        {regError && (
+          <Alert severity="error" style={{ marginBottom: "15px" }}>
+            {regError}
+          </Alert>
+        )}
+        {regSuccess && (
+          <Alert severity="success" style={{ marginBottom: "15px" }}>
+            {regSuccess}
+          </Alert>
+        )}
 
-            <form onSubmit={handleLogin}>
-              <TextField
-                label="Login Name"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                value={loginName}
-                onChange={(e) => setLoginName(e.target.value)}
-                autoFocus
-              />
-              <TextField
-                label="Password"
-                variant="outlined"
-                type="password"
-                fullWidth
-                margin="normal"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-                size="large"
-                style={{ marginTop: "15px" }}
-              >
-                Login
-              </Button>
-            </form>
-          </Paper>
-        </Grid>
+        <form onSubmit={handleRegister}>
+          <TextField
+            label="Login Name *"
+            variant="outlined"
+            fullWidth
+            margin="dense"
+            value={regLoginName}
+            onChange={(e) => setRegLoginName(e.target.value)}
+            autoFocus
+          />
+          <Box display="flex" gap={2}>
+            <TextField
+              label="First Name *"
+              variant="outlined"
+              fullWidth
+              margin="dense"
+              value={regFirstName}
+              onChange={(e) => setRegFirstName(e.target.value)}
+            />
+            <TextField
+              label="Last Name *"
+              variant="outlined"
+              fullWidth
+              margin="dense"
+              value={regLastName}
+              onChange={(e) => setRegLastName(e.target.value)}
+            />
+          </Box>
+          <TextField
+            label="Password *"
+            variant="outlined"
+            type="password"
+            fullWidth
+            margin="dense"
+            value={regPassword}
+            onChange={(e) => setRegPassword(e.target.value)}
+          />
+          <TextField
+            label="Confirm Password *"
+            variant="outlined"
+            type="password"
+            fullWidth
+            margin="dense"
+            value={regPasswordConfirm}
+            onChange={(e) => setRegPasswordConfirm(e.target.value)}
+          />
+          <TextField
+            label="Location"
+            variant="outlined"
+            fullWidth
+            margin="dense"
+            value={regLocation}
+            onChange={(e) => setRegLocation(e.target.value)}
+          />
+          <TextField
+            label="Occupation"
+            variant="outlined"
+            fullWidth
+            margin="dense"
+            value={regOccupation}
+            onChange={(e) => setRegOccupation(e.target.value)}
+          />
+          <TextField
+            label="Description"
+            variant="outlined"
+            fullWidth
+            margin="dense"
+            multiline
+            rows={2}
+            value={regDescription}
+            onChange={(e) => setRegDescription(e.target.value)}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="success"
+            fullWidth
+            size="large"
+            style={{ marginTop: "15px" }}
+          >
+            Register Me
+          </Button>
+        </form>
 
-        {/* REGISTER SECTION */}
-        <Grid item xs={12} md={7}>
-          <Paper elevation={3} className="login-register-paper">
-            <Typography variant="h5" gutterBottom className="section-title">
-              📝 Register New Account
-            </Typography>
-            <Divider style={{ marginBottom: "20px" }} />
-
-            {regError && (
-              <Alert severity="error" style={{ marginBottom: "15px" }}>
-                {regError}
-              </Alert>
-            )}
-            {regSuccess && (
-              <Alert severity="success" style={{ marginBottom: "15px" }}>
-                {regSuccess}
-              </Alert>
-            )}
-
-            <form onSubmit={handleRegister}>
-              <TextField
-                label="Login Name *"
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                value={regLoginName}
-                onChange={(e) => setRegLoginName(e.target.value)}
-              />
-              <Box display="flex" gap={2}>
-                <TextField
-                  label="First Name *"
-                  variant="outlined"
-                  fullWidth
-                  margin="dense"
-                  value={regFirstName}
-                  onChange={(e) => setRegFirstName(e.target.value)}
-                />
-                <TextField
-                  label="Last Name *"
-                  variant="outlined"
-                  fullWidth
-                  margin="dense"
-                  value={regLastName}
-                  onChange={(e) => setRegLastName(e.target.value)}
-                />
-              </Box>
-              <TextField
-                label="Password *"
-                variant="outlined"
-                type="password"
-                fullWidth
-                margin="dense"
-                value={regPassword}
-                onChange={(e) => setRegPassword(e.target.value)}
-              />
-              <TextField
-                label="Confirm Password *"
-                variant="outlined"
-                type="password"
-                fullWidth
-                margin="dense"
-                value={regPasswordConfirm}
-                onChange={(e) => setRegPasswordConfirm(e.target.value)}
-              />
-              <TextField
-                label="Location"
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                value={regLocation}
-                onChange={(e) => setRegLocation(e.target.value)}
-              />
-              <TextField
-                label="Occupation"
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                value={regOccupation}
-                onChange={(e) => setRegOccupation(e.target.value)}
-              />
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                margin="dense"
-                multiline
-                rows={2}
-                value={regDescription}
-                onChange={(e) => setRegDescription(e.target.value)}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                color="success"
-                fullWidth
-                size="large"
-                style={{ marginTop: "15px" }}
-              >
-                Register Me
-              </Button>
-            </form>
-          </Paper>
-        </Grid>
-      </Grid>
+        <Box mt={3} textAlign="center">
+          <Typography variant="body2">
+            Already have an account?{" "}
+            <Button
+              color="primary"
+              onClick={() => {
+                setIsRegisterMode(false);
+                setRegError("");
+                setRegSuccess("");
+              }}
+            >
+              Login here
+            </Button>
+          </Typography>
+        </Box>
+      </Paper>
     </div>
   );
 }

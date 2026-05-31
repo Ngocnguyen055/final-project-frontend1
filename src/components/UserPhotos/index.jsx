@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Typography, Card, CardMedia, CardContent, Divider, Avatar, List, ListItem, ListItemAvatar, ListItemText, CircularProgress, Box, Button, TextField } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
-import fetchModel, { fetchModelPost } from "../../lib/fetchModelData";
+import fetchModel, { fetchModelPost, backendBaseUrl } from "../../lib/fetchModelData";
 import "./styles.css";
 
 // Nhận prop advancedFeatures và loggedInUser
@@ -86,7 +86,7 @@ function UserPhotos({ advancedFeatures, loggedInUser }) {
         <Card key={photo._id} style={{ marginBottom: '20px' }}>
             <CardMedia
                 component="img"
-                image={`/images/${photo.file_name}`} 
+                image={`${backendBaseUrl}/images/${photo.file_name}`} 
                 alt="User posted"
                 style={{ maxHeight: '500px', objectFit: 'contain', backgroundColor: '#f0f0f0' }}
             />

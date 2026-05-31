@@ -125,4 +125,4 @@ function fetchModelUpload(url, formData) {
 }
 
 export default fetchModel;
-export { fetchModelPost, fetchModelUpload };
+export { fetchModelPost, fetchModelUpload, backendBaseUrl };

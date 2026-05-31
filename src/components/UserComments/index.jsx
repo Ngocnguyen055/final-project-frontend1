@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Divider, List, ListItem, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
 import { Link, useParams } from 'react-router-dom';
-import fetchModel from '../../lib/fetchModelData';
+import fetchModel, { backendBaseUrl } from '../../lib/fetchModelData';
 
 function UserComments() {
     // useParams giúp lấy cái ID từ trên thanh URL xuống
@@ -39,7 +39,7 @@ function UserComments() {
                             {/* Đã bỏ thẻ <Link> ở đây đi để tránh lỗi lồng 2 thẻ Link vào nhau */}
                             <Avatar 
                                 variant="square" 
-                                src={`/images/${c.photo_file_name}`} 
+                                src={`${backendBaseUrl}/images/${c.photo_file_name}`} 
                                 style={{ width: 80, height: 80, marginRight: 15 }} 
                             />
                         </ListItemAvatar>
