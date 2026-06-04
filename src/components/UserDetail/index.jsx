@@ -6,7 +6,7 @@ import "./styles.css";
 
 function UserDetail() {
     const { userId } = useParams();
-    
+
     // Thay vì gọi trực tiếp model, ta dùng state để lưu user data
     // Khởi tạo là null (giống như cách bạn làm trang chi tiết BlogDetail)
     const [user, setUser] = useState(null);
@@ -14,8 +14,8 @@ function UserDetail() {
     // useEffect sẽ chạy lại mỗi khi userId trên URL thay đổi
     useEffect(() => {
         // Reset user về null khi đổi sang userId khác để hiển thị loading
-        setUser(null); 
-        
+        setUser(null);
+
         fetchModel(`/user/${userId}`)
             .then(response => {
                 setUser(response.data);
@@ -23,7 +23,7 @@ function UserDetail() {
             .catch(error => {
                 console.error("Lỗi khi tải chi tiết user:", error);
             });
-    }, [userId]); 
+    }, [userId]);
 
     // Hiển thị trạng thái loading khi chưa có dữ liệu
     if (!user) {
@@ -40,7 +40,7 @@ function UserDetail() {
             <Typography variant="h4" gutterBottom>
                 {user.first_name} {user.last_name}
             </Typography>
-            
+
             <Divider style={{ marginBottom: '15px' }} />
 
             <Typography variant="body1" gutterBottom>
@@ -54,10 +54,10 @@ function UserDetail() {
             </Typography>
 
             <div style={{ marginTop: '20px' }}>
-                <Button 
-                    variant="contained" 
-                    color="primary" 
-                    component={Link} 
+                <Button
+                    variant="contained"
+                    color="primary"
+                    component={Link}
                     to={`/photos/${user._id}`}
                 >
                     Xem ảnh của {user.first_name}

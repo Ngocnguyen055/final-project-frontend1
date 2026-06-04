@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Typography, Card, CardMedia, CardContent, Divider, Avatar, List, ListItem, ListItemAvatar, ListItemText, CircularProgress, Box, Button, TextField } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
 import fetchModel, { fetchModelPost, backendBaseUrl } from "../../lib/fetchModelData";
 import "./styles.css";
 
-// Nhận prop advancedFeatures và loggedInUser
-function UserPhotos({ advancedFeatures, loggedInUser }) {
-    // 1. Lấy thêm photoId từ URL (cái mà bạn đã cấu hình ở App.js)
+// Nhận prop loggedInUser
+function UserPhotos({ loggedInUser }) {
+    // Lấy thêm photoId từ URL (cái mà đã cấu hình ở App.js)
     const { userId, photoId } = useParams(); 
     const [photos, setPhotos] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    
-    // State để nhớ xem đang xem bức ảnh thứ mấy
-    const [currentIndex, setCurrentIndex] = useState(0);
 
     // State cho comment input - mỗi ảnh có comment riêng
     const [commentTexts, setCommentTexts] = useState({});
+
+    // Ref để scroll đến đúng ảnh khi bấm từ bình luận
+    const photoRefs = useRef({});
 
     const fetchPhotos = () => {
         setIsLoading(true);
@@ -24,17 +24,6 @@ function UserPhotos({ advancedFeatures, loggedInUser }) {
             .then(response => {
                 const fetchedPhotos = response.data;
                 setPhotos(fetchedPhotos);
-
-                // 2. LOGIC QUAN TRỌNG: Tìm vị trí của ảnh dựa trên photoId
-                if (photoId && fetchedPhotos.length > 0) {
-                    const index = fetchedPhotos.findIndex(p => p._id === photoId);
-                    // Nếu tìm thấy ảnh, nhảy đến index đó, nếu không thì về 0
-                    setCurrentIndex(index !== -1 ? index : 0);
-                } else {
-                    // Nếu không có photoId trên URL (vào xem ảnh bình thường), reset về 0
-                    setCurrentIndex(0);
-                }
-
                 setIsLoading(false);
             })
             .catch(error => {
@@ -45,23 +34,44 @@ function UserPhotos({ advancedFeatures, loggedInUser }) {
 
     useEffect(() => {
         fetchPhotos();
-    }, [userId, photoId]); // 3. Thêm photoId vào dependency để nó chạy lại khi ID ảnh thay đổi
+    }, [userId, photoId]);
+
+    // Scroll đến ảnh cụ thể khi có photoId và photos đã load xong
+    useEffect(() => {
+        if (photoId && photos.length > 0 && !isLoading) {
+            // Đợi DOM render xong rồi mới scroll
+            setTimeout(() => {
+                const targetRef = photoRefs.current[photoId];
+                if (targetRef) {
+                    targetRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Thêm hiệu ứng highlight nhấp nháy để dễ nhận biết
+                    targetRef.style.outline = '3px solid #1976d2';
+                    targetRef.style.outlineOffset = '4px';
+                    targetRef.style.borderRadius = '8px';
+                    // Bỏ highlight sau 2 giây
+                    setTimeout(() => {
+                        targetRef.style.outline = 'none';
+                    }, 2000);
+                }
+            }, 300);
+        }
+    }, [photoId, photos, isLoading]);
 
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         return new Date(dateString).toLocaleDateString('vi-VN', options);
     };
 
-    const handleAddComment = async (photoId) => {
-        const commentText = commentTexts[photoId] || "";
+    const handleAddComment = async (targetPhotoId) => {
+        const commentText = commentTexts[targetPhotoId] || "";
         if (!commentText.trim()) return;
 
         try {
-            await fetchModelPost(`/commentsOfPhoto/${photoId}`, {
+            await fetchModelPost(`/commentsOfPhoto/${targetPhotoId}`, {
                 comment: commentText,
             });
             // Clear the comment input
-            setCommentTexts(prev => ({ ...prev, [photoId]: "" }));
+            setCommentTexts(prev => ({ ...prev, [targetPhotoId]: "" }));
             // Reload photos to show the new comment
             fetchPhotos();
         } catch (error) {
@@ -81,9 +91,13 @@ function UserPhotos({ advancedFeatures, loggedInUser }) {
         return <Typography variant="h6">Người dùng này chưa có ảnh nào.</Typography>;
     }
 
-    // Hàm render 1 bức ảnh (giữ nguyên logic của bạn + thêm comment form)
+    // Hàm render 1 bức ảnh
     const renderPhoto = (photo) => (
-        <Card key={photo._id} style={{ marginBottom: '20px' }}>
+        <Card 
+            key={photo._id} 
+            style={{ marginBottom: '20px' }}
+            ref={(el) => { photoRefs.current[photo._id] = el; }}
+        >
             <CardMedia
                 component="img"
                 image={`${backendBaseUrl}/images/${photo.file_name}`} 
@@ -166,34 +180,7 @@ function UserPhotos({ advancedFeatures, loggedInUser }) {
         </Card>
     );
 
-    // Nếu bật Advanced Features -> Hiển thị 1 ảnh và có nút bấm
-    if (advancedFeatures) {
-        return (
-            <div className="photos-container">
-                {/* Đảm bảo currentIndex không vượt quá phạm vi mảng */}
-                {photos[currentIndex] && renderPhoto(photos[currentIndex])}
-                
-                <Box display="flex" justifyContent="space-between" mt={2}>
-                    <Button 
-                        variant="contained" 
-                        disabled={currentIndex === 0} 
-                        onClick={() => setCurrentIndex(currentIndex - 1)}
-                    >
-                        Quay lại 
-                    </Button>
-                    <Button 
-                        variant="contained" 
-                        disabled={currentIndex === photos.length - 1} 
-                        onClick={() => setCurrentIndex(currentIndex + 1)}
-                    >
-                        Tiếp theo 
-                    </Button>
-                </Box>
-            </div>
-        );
-    }
-
-    // Chế độ bình thường: Hiện tất cả
+    // Luôn hiển thị tất cả ảnh (không còn chế độ Advanced Features)
     return (
         <div className="photos-container">
             {photos.map(renderPhoto)}

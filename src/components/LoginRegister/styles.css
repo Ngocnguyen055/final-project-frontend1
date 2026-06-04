@@ -1,15 +1,121 @@
-.login-register-container {
+/* ========== Container chính - căn giữa màn hình ========== */
+.login-container {
+  display: flex;
+  justify-content: center;  /* căn giữa ngang */
   padding: 40px 20px;
-  max-width: 500px;
-  margin: 0 auto;
 }
 
-.login-register-paper {
+/* ========== Hộp form đăng nhập/đăng ký ========== */
+.login-box {
+  width: 100%;
+  max-width: 420px;        /* giới hạn chiều rộng */
+  background: white;
   padding: 30px;
+  border: 1px solid #ddd;  /* viền nhẹ */
+  border-radius: 6px;      /* bo góc */
 }
 
-.section-title {
+.login-box h2 {
   text-align: center;
-  font-weight: 600 !important;
+  margin-bottom: 20px;
 }
 
+/* ========== Label và Input ========== */
+.login-box label {
+  display: block;           /* mỗi label chiếm 1 dòng */
+  margin-bottom: 4px;
+  margin-top: 12px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.login-box input,
+.login-box textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;  /* để padding không làm tràn width */
+}
+
+.login-box textarea {
+  resize: vertical;        /* cho phép kéo dài textarea theo chiều dọc */
+}
+
+/* ========== 2 ô input nằm cạnh nhau (Họ + Tên) ========== */
+.form-row {
+  display: flex;
+  gap: 10px;               /* khoảng cách giữa 2 ô */
+}
+
+.form-group {
+  flex: 1;                 /* mỗi ô chiếm đều nhau */
+}
+
+/* ========== Nút bấm ========== */
+.btn-primary,
+.btn-success {
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #1976d2;  /* xanh dương */
+}
+
+.btn-primary:hover {
+  background-color: #1565c0;
+}
+
+.btn-success {
+  background-color: #2e7d32;  /* xanh lá */
+}
+
+.btn-success:hover {
+  background-color: #1b5e20;
+}
+
+/* ========== Thông báo lỗi / thành công ========== */
+.error-msg {
+  background-color: #fdecea;
+  color: #d32f2f;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.success-msg {
+  background-color: #edf7ed;
+  color: #2e7d32;
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* ========== Dòng chuyển đổi Login/Register ========== */
+.switch-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.switch-link {
+  background: none;        /* bỏ nền mặc định của button */
+  border: none;            /* bỏ viền mặc định của button */
+  padding: 0;
+  color: #1976d2;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.switch-link:hover {
+  color: #1565c0;
+}

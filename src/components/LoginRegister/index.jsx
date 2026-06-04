@@ -1,13 +1,4 @@
 import React, { useState } from "react";
-import {
-  Typography,
-  TextField,
-  Button,
-  Paper,
-  Divider,
-  Alert,
-  Box,
-} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { fetchModelPost } from "../../lib/fetchModelData";
 import "./styles.css";
@@ -15,7 +6,7 @@ import "./styles.css";
 function LoginRegister({ onLogin }) {
   const navigate = useNavigate();
 
-  // Toggle between login and register view
+  // Toggle between Login and Register
   const [isRegisterMode, setIsRegisterMode] = useState(false);
 
   // Login state
@@ -40,11 +31,11 @@ function LoginRegister({ onLogin }) {
     setLoginError("");
 
     if (!loginName.trim()) {
-      setLoginError("Vui lòng nhập tên đăng nhập");
+      setLoginError("Please enter login name");
       return;
     }
     if (!loginPassword.trim()) {
-      setLoginError("Vui lòng nhập mật khẩu");
+      setLoginError("Please enter password");
       return;
     }
 
@@ -54,14 +45,9 @@ function LoginRegister({ onLogin }) {
         password: loginPassword,
       });
 
-      // Save token and user info to localStorage
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data));
-
-      // Notify parent component
       onLogin(response.data);
-
-      // Navigate to the logged-in user's detail page
       navigate(`/users/${response.data._id}`);
     } catch (error) {
       setLoginError(error.message || "Login failed. Please try again.");
@@ -106,7 +92,6 @@ function LoginRegister({ onLogin }) {
       });
 
       setRegSuccess("Registration successful! You can now login.");
-      // Clear the form
       setRegLoginName("");
       setRegPassword("");
       setRegPasswordConfirm("");
@@ -123,189 +108,151 @@ function LoginRegister({ onLogin }) {
   // ==================== LOGIN VIEW ====================
   if (!isRegisterMode) {
     return (
-      <div className="login-register-container">
-        <Paper elevation={3} className="login-register-paper">
-          <Typography variant="h5" gutterBottom className="section-title">
-            🔐 Login
-          </Typography>
-          <Divider style={{ marginBottom: "20px" }} />
+      <div className="login-container">
+        <div className="login-box">
+          <h2>Login</h2>
 
-          {loginError && (
-            <Alert severity="error" style={{ marginBottom: "15px" }}>
-              {loginError}
-            </Alert>
-          )}
+          {loginError && <p className="error-msg">{loginError}</p>}
 
           <form onSubmit={handleLogin}>
-            <TextField
-              label="Login Name"
-              variant="outlined"
-              fullWidth
-              margin="normal"
+            <label>Login Name</label>
+            <input
+              type="text"
               value={loginName}
               onChange={(e) => setLoginName(e.target.value)}
-              autoFocus
+              placeholder="Enter login name"
             />
-            <TextField
-              label="Password"
-              variant="outlined"
+
+            <label>Password</label>
+            <input
               type="password"
-              fullWidth
-              margin="normal"
               value={loginPassword}
               onChange={(e) => setLoginPassword(e.target.value)}
+              placeholder="Enter password"
             />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              size="large"
-              style={{ marginTop: "15px" }}
-            >
+
+            <button type="submit" className="btn-primary">
               Login
-            </Button>
+            </button>
           </form>
 
-          <Box mt={3} textAlign="center">
-            <Typography variant="body2">
-              Don't have an account?{" "}
-              <Button
-                color="primary"
-                onClick={() => {
-                  setIsRegisterMode(true);
-                  setLoginError("");
-                }}
-              >
-                Register here
-              </Button>
-            </Typography>
-          </Box>
-        </Paper>
+          <p className="switch-text">
+            Don't have an account?{" "}
+            <button
+              type="button"
+              className="switch-link"
+              onClick={() => {
+                setIsRegisterMode(true);
+                setLoginError("");
+              }}
+            >
+              Register here
+            </button>
+          </p>
+        </div>
       </div>
     );
   }
 
   // ==================== REGISTER VIEW ====================
   return (
-    <div className="login-register-container">
-      <Paper elevation={3} className="login-register-paper">
-        <Typography variant="h5" gutterBottom className="section-title">
-          📝 Register New Account
-        </Typography>
-        <Divider style={{ marginBottom: "20px" }} />
+    <div className="login-container">
+      <div className="login-box">
+        <h2>Register New Account</h2>
 
-        {regError && (
-          <Alert severity="error" style={{ marginBottom: "15px" }}>
-            {regError}
-          </Alert>
-        )}
-        {regSuccess && (
-          <Alert severity="success" style={{ marginBottom: "15px" }}>
-            {regSuccess}
-          </Alert>
-        )}
+        {regError && <p className="error-msg">{regError}</p>}
+        {regSuccess && <p className="success-msg">{regSuccess}</p>}
 
         <form onSubmit={handleRegister}>
-          <TextField
-            label="Login Name *"
-            variant="outlined"
-            fullWidth
-            margin="dense"
+          <label>Login Name *</label>
+          <input
+            type="text"
             value={regLoginName}
             onChange={(e) => setRegLoginName(e.target.value)}
-            autoFocus
+            placeholder="Enter login name"
           />
-          <Box display="flex" gap={2}>
-            <TextField
-              label="First Name *"
-              variant="outlined"
-              fullWidth
-              margin="dense"
-              value={regFirstName}
-              onChange={(e) => setRegFirstName(e.target.value)}
-            />
-            <TextField
-              label="Last Name *"
-              variant="outlined"
-              fullWidth
-              margin="dense"
-              value={regLastName}
-              onChange={(e) => setRegLastName(e.target.value)}
-            />
-          </Box>
-          <TextField
-            label="Password *"
-            variant="outlined"
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>First Name *</label>
+              <input
+                type="text"
+                value={regFirstName}
+                onChange={(e) => setRegFirstName(e.target.value)}
+                placeholder="First name"
+              />
+            </div>
+            <div className="form-group">
+              <label>Last Name *</label>
+              <input
+                type="text"
+                value={regLastName}
+                onChange={(e) => setRegLastName(e.target.value)}
+                placeholder="Last name"
+              />
+            </div>
+          </div>
+
+          <label>Password *</label>
+          <input
             type="password"
-            fullWidth
-            margin="dense"
             value={regPassword}
             onChange={(e) => setRegPassword(e.target.value)}
+            placeholder="Enter password"
           />
-          <TextField
-            label="Confirm Password *"
-            variant="outlined"
+
+          <label>Confirm Password *</label>
+          <input
             type="password"
-            fullWidth
-            margin="dense"
             value={regPasswordConfirm}
             onChange={(e) => setRegPasswordConfirm(e.target.value)}
+            placeholder="Confirm password"
           />
-          <TextField
-            label="Location"
-            variant="outlined"
-            fullWidth
-            margin="dense"
+
+          <label>Location</label>
+          <input
+            type="text"
             value={regLocation}
             onChange={(e) => setRegLocation(e.target.value)}
+            placeholder="Location"
           />
-          <TextField
-            label="Occupation"
-            variant="outlined"
-            fullWidth
-            margin="dense"
+
+          <label>Occupation</label>
+          <input
+            type="text"
             value={regOccupation}
             onChange={(e) => setRegOccupation(e.target.value)}
+            placeholder="Occupation"
           />
-          <TextField
-            label="Description"
-            variant="outlined"
-            fullWidth
-            margin="dense"
-            multiline
-            rows={2}
+
+          <label>Description</label>
+          <textarea
             value={regDescription}
             onChange={(e) => setRegDescription(e.target.value)}
+            placeholder="About yourself"
+            rows={3}
           />
-          <Button
-            type="submit"
-            variant="contained"
-            color="success"
-            fullWidth
-            size="large"
-            style={{ marginTop: "15px" }}
-          >
+
+          <button type="submit" className="btn-success">
             Register Me
-          </Button>
+          </button>
         </form>
 
-        <Box mt={3} textAlign="center">
-          <Typography variant="body2">
-            Already have an account?{" "}
-            <Button
-              color="primary"
-              onClick={() => {
-                setIsRegisterMode(false);
-                setRegError("");
-                setRegSuccess("");
-              }}
-            >
-              Login here
-            </Button>
-          </Typography>
-        </Box>
-      </Paper>
+        <p className="switch-text">
+          Already have an account?{" "}
+          <button
+            type="button"
+            className="switch-link"
+            onClick={() => {
+              setIsRegisterMode(false);
+              setRegError("");
+              setRegSuccess("");
+            }}
+          >
+            Login here
+          </button>
+        </p>
+      </div>
     </div>
   );
 }

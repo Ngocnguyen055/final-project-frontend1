@@ -11,9 +11,6 @@ import UserComments from './components/UserComments';
 import LoginRegister from './components/LoginRegister';
 
 const App = () => {
-  // State quản lý tính năng nâng cao (mặc định là false)
-  const [advancedFeatures, setAdvancedFeatures] = useState(false);
-  
   // State quản lý user đang đăng nhập
   const [loggedInUser, setLoggedInUser] = useState(() => {
     // Khôi phục từ localStorage khi app load
@@ -48,10 +45,7 @@ const App = () => {
       <div>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            {/* Truyền state và hàm thay đổi state xuống TopBar */}
             <TopBar 
-              advancedFeatures={advancedFeatures} 
-              setAdvancedFeatures={setAdvancedFeatures}
               loggedInUser={loggedInUser}
               onLogout={handleLogout}
             />
@@ -79,17 +73,17 @@ const App = () => {
                       path="/photos/:userId" 
                       element={
                         <ProtectedRoute>
-                          <UserPhotos advancedFeatures={advancedFeatures} loggedInUser={loggedInUser} />
+                          <UserPhotos loggedInUser={loggedInUser} />
                         </ProtectedRoute>
                       } 
                     />
                     
-                    {/* MỚI THÊM: Dành cho trường hợp bấm từ bình luận sang (có đuôi photoId) */}
+                    {/* Dành cho trường hợp bấm từ bình luận sang (có đuôi photoId) */}
                     <Route 
                       path="/photos/:userId/:photoId" 
                       element={
                         <ProtectedRoute>
-                          <UserPhotos advancedFeatures={advancedFeatures} loggedInUser={loggedInUser} />
+                          <UserPhotos loggedInUser={loggedInUser} />
                         </ProtectedRoute>
                       } 
                     />
