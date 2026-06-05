@@ -88,41 +88,6 @@ function fetchModelPost(url, body) {
   });
 }
 
-/**
- * fetchModelUpload - Send a POST request with FormData (file upload).
- *
- * @param {string} url      The URL to issue the POST request.
- * @param {FormData} formData  The FormData to send.
- * @returns {Promise}       A Promise that resolves with the response data.
- */
-function fetchModelUpload(url, formData) {
-  const fullUrl = url.startsWith("/") ? backendBaseUrl + url : url;
-  const token = localStorage.getItem("token");
-
-  return new Promise(function (resolve, reject) {
-    fetch(fullUrl, {
-      method: "POST",
-      headers: token ? { Authorization: "Bearer " + token } : {},
-      body: formData, // Don't set Content-Type - browser sets it with boundary
-    })
-      .then(function (response) {
-        handleUnauthorized(response);
-        if (!response.ok) {
-          return response.text().then(function (text) {
-            throw new Error(text || "Lỗi HTTP: " + response.status);
-          });
-        }
-        return response.json();
-      })
-      .then(function (data) {
-        resolve({ data: data });
-      })
-      .catch(function (error) {
-        console.error("Lỗi khi upload tới URL:", fullUrl, error);
-        reject(error);
-      });
-  });
-}
-
 export default fetchModel;
-export { fetchModelPost, fetchModelUpload, backendBaseUrl };
+export { fetchModelPost, backendBaseUrl };
+
