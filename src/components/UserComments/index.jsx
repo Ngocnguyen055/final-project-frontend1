@@ -8,6 +8,17 @@ function UserComments() {
     const { userId } = useParams(); 
     const [comments, setComments] = useState([]);
 
+    const formatCommentDate = (dateString) => {
+        const date = new Date(dateString);
+        const pad = (value) => String(value).padStart(2, '0');
+        const hours = pad(date.getHours());
+        const minutes = pad(date.getMinutes());
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${hours}:${minutes}, ${day}/${month}/${year}`;
+    };
+
     useEffect(() => {
         // Gọi API nãy mình viết ở backend
         fetchModel(`/commentsOfUser/${userId}`)
@@ -47,7 +58,7 @@ function UserComments() {
                             primary={<Typography variant="body1">{c.comment}</Typography>}
                             secondary={
                                 <Typography variant="caption" color="textSecondary">
-                                    {new Date(c.date_time).toLocaleString()}
+                                    Lúc: {formatCommentDate(c.date_time)}
                                 </Typography>
                             }
                         />
