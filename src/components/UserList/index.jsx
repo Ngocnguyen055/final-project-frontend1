@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Divider, List, ListItem, ListItemText, Typography } from "@mui/material";
+import {  ListItem, ListItemText, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import fetchModel from "../../lib/fetchModelData";
-import "./styles.css";
 
 function UserList ({ loggedInUser }) {
     // Tạo state để chứa danh sách user, ban đầu là mảng rỗng
@@ -27,7 +26,7 @@ function UserList ({ loggedInUser }) {
 
     if (!loggedInUser) {
         return (
-            <Typography variant="body1" style={{ padding: '16px' }}>
+            <Typography variant="body1" style={{ padding: 16, color: '#444' }}>
                 Vui lòng đăng nhập để xem danh sách người dùng.
             </Typography>
         );
@@ -37,55 +36,25 @@ function UserList ({ loggedInUser }) {
       <div>
         {/* Nếu chưa có dữ liệu thì hiện chữ Đang tải... */}
         {users.length === 0 ? (
-            <Typography variant="body1" style={{ padding: '16px' }}>
-                Đang tải danh sách người dùng...
-            </Typography>
+            <Typography variant="body1" style={{ padding: 16, color: '#444' }}>Đang tải danh sách người dùng...</Typography>
         ) : (
-            <List component="nav">
-            {users.map((user) => (
-                <React.Fragment key={user._id}>
-                {/* Bỏ thuộc tính button component={Link} ở đây đi để tránh click nhầm */}
-                <ListItem>
-                    
-                    {/* Phần 1: Tên người dùng - Bấm vào sẽ sang trang Chi tiết user */}
-                    <Link to={`/users/${user._id}`} style={{ textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
-                        <ListItemText primary={`${user.first_name} ${user.last_name}`} />
-                    </Link>
+            <div style={{ maxWidth: 720, margin: '12px auto', background: '#fff', borderRadius: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                {users.map((user) => (
+                    <React.Fragment key={user._id}>
+                        <ListItem style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px' }}>
+                            <Link to={`/users/${user._id}`} style={{ flex: 1, color: '#111', textDecoration: 'none', fontWeight: 600 }}>
+                                <ListItemText primary={`${user.first_name} ${user.last_name}`} />
+                            </Link>
 
-                    {/* Phần 2: Bong bóng đếm số ảnh (Màu xanh) - Không có link */}
-                    <span style={{ 
-                        backgroundColor: 'green', 
-                        color: 'white', 
-                        borderRadius: '10px', 
-                        padding: '2px 8px', 
-                        marginLeft: '5px', 
-                        fontSize: '12px', 
-                        fontWeight: 'bold' 
-                    }}>
-                        {user.photo_count || 0}
-                    </span>
-
-                    {/* Phần 3: Bong bóng đếm số bình luận (Màu đỏ) - Bấm vào sẽ sang trang Bình luận */}
-                    <Link to={`/comments/${user._id}`} style={{ textDecoration: 'none' }}>
-                        <span style={{ 
-                            backgroundColor: 'red', 
-                            color: 'white', 
-                            borderRadius: '10px', 
-                            padding: '2px 8px', 
-                            marginLeft: '5px', 
-                            fontSize: '12px', 
-                            fontWeight: 'bold', 
-                            cursor: 'pointer' 
-                        }}>
-                            {user.comment_count || 0}
-                        </span>
-                    </Link>
-
-                </ListItem>
-                <Divider />
-                </React.Fragment>
-            ))}
-            </List>
+                            <span style={{ display: 'inline-block', minWidth: 30, textAlign: 'center', padding: '4px 8px', borderRadius: 12, color: '#fff', fontSize: 12, fontWeight: 700, marginLeft: 8, background: 'green' }}>{user.photo_count || 0}</span>
+                            <Link to={`/comments/${user._id}`} style={{ textDecoration: 'none' }}>
+                                <span style={{ display: 'inline-block', minWidth: 30, textAlign: 'center', padding: '4px 8px', borderRadius: 12, color: '#fff', fontSize: 12, fontWeight: 700, marginLeft: 8, background: 'red' }}>{user.comment_count || 0}</span>
+                            </Link>
+                        </ListItem>
+                        <hr style={{ height: 1, background: '#eee', border: 'none', margin: 0 }} />
+                    </React.Fragment>
+                ))}
+            </div>
         )}
       </div>
     );
