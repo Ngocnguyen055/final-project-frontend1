@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Typography, Card, CardMedia, CardContent, Divider, Avatar, List, ListItem, ListItemAvatar, ListItemText, CircularProgress, Box, Button, TextField } from "@mui/material";
-import { useParams, Link } from "react-router-dom";
+import { Typography, Divider, CircularProgress, Box, Button, TextField } from "@mui/material";
+import { useParams } from "react-router-dom";
 import fetchModel, { fetchModelPost, backendBaseUrl } from "../../lib/fetchModelData";
-import "./styles.css";
 
 // Nhận prop loggedInUser
 function UserPhotos({ loggedInUser }) {
@@ -58,8 +57,14 @@ function UserPhotos({ loggedInUser }) {
     }, [photoId, photos, isLoading]);
 
     const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-        return new Date(dateString).toLocaleDateString('vi-VN', options);
+        const date = new Date(dateString);
+        const pad = (value) => String(value).padStart(2, '0');
+        const hours = pad(date.getHours());
+        const minutes = pad(date.getMinutes());
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${hours}:${minutes}, ${day}/${month}/${year}`;
     };
 
     const handleAddComment = async (targetPhotoId) => {
@@ -88,101 +93,44 @@ function UserPhotos({ loggedInUser }) {
     }
 
     if (photos.length === 0) {
-        return <Typography variant="h6">Người dùng này chưa có ảnh nào.</Typography>;
+        return <Typography variant="h6" style={{ padding: 12, color: '#555' }}>Người dùng này chưa có ảnh nào.</Typography>;
     }
 
     // Hàm render 1 bức ảnh
     const renderPhoto = (photo) => (
-        <Card 
-            key={photo._id} 
-            style={{ marginBottom: '20px' }}
-            ref={(el) => { photoRefs.current[photo._id] = el; }}
-        >
-            <CardMedia
-                component="img"
-                image={`${backendBaseUrl}/images/${photo.file_name}`} 
-                alt="User posted"
-                style={{ maxHeight: '500px', objectFit: 'contain', backgroundColor: '#f0f0f0' }}
-            />
-            <CardContent>
-                <Typography variant="caption" color="textSecondary" display="block" gutterBottom>
-                    Đăng lúc: {formatDate(photo.date_time)}
-                </Typography>
-                <Divider style={{ margin: '10px 0' }} />
-                <Typography variant="h6">Bình luận</Typography>
+        <div key={photo._id} style={{ background: '#fff', borderRadius: 4, border: '1px solid #ddd', overflow: 'hidden' }} ref={(el) => { photoRefs.current[photo._id] = el; }}>
+            <img src={`${backendBaseUrl}/images/${photo.file_name}`} alt="User posted" style={{ width: '100%', display: 'block', background: '#f8f8f8', objectFit: 'contain', maxHeight: 420 }} />
+            <div style={{ padding: '12px 14px' }}>
+                <Typography variant="caption" style={{ fontSize: 13, color: '#333', marginBottom: 8 }}>Đăng lúc: {formatDate(photo.date_time)}</Typography>
+                <Divider style={{ margin: '8px 0', backgroundColor: '#eee', height: 1 }} />
+                <Typography variant="h6" style={{ fontSize: 16, margin: '8px 0' }}>Bình luận</Typography>
                 {photo.comments && photo.comments.length > 0 ? (
-                    <List>
+                    <div style={{ marginTop: 8 }}>
                         {photo.comments.map((comment) => (
-                            <React.Fragment key={comment._id}>
-                                <ListItem alignItems="flex-start">
-                                    <ListItemAvatar>
-                                        <Avatar component={Link} to={`/users/${comment.user._id}`} style={{ textDecoration: 'none' }}>
-                                            {comment.user.first_name[0]}
-                                        </Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        primary={
-                                            <Typography variant="subtitle2" component={Link} to={`/users/${comment.user._id}`} style={{ textDecoration: 'none', color: '#1976d2' }}>
-                                                {comment.user.first_name} {comment.user.last_name}
-                                            </Typography>
-                                        }
-                                        secondary={
-                                            <>
-                                                <Typography component="span" variant="body2" color="textPrimary">
-                                                    {comment.comment}
-                                                </Typography>
-                                                <br />
-                                                <Typography variant="caption" color="textSecondary">
-                                                    {formatDate(comment.date_time)}
-                                                </Typography>
-                                            </>
-                                        }
-                                    />
-                                </ListItem>
-                                <Divider variant="inset" component="li" />
-                            </React.Fragment>
+                            <div key={comment._id} style={{ padding: '8px 0', borderBottom: '1px solid #eee' }}>
+                                <div style={{ fontWeight: 600, color: '#222' }}>{comment.user.first_name} {comment.user.last_name}</div>
+                                <div style={{ margin: '4px 0', color: '#333' }}>{comment.comment}</div>
+                                <div style={{ fontSize: 12, color: '#555' }}>Lúc: {formatDate(comment.date_time)}</div>
+                            </div>
                         ))}
-                    </List>
+                    </div>
                 ) : (
                     <Typography variant="body2" color="textSecondary">Chưa có bình luận nào.</Typography>
                 )}
 
-                {/* Add Comment Form */}
                 {loggedInUser && (
-                    <Box mt={2} display="flex" gap={1} alignItems="flex-start">
-                        <TextField
-                            placeholder="Write a comment..."
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            multiline
-                            maxRows={3}
-                            value={commentTexts[photo._id] || ""}
-                            onChange={(e) => setCommentTexts(prev => ({ ...prev, [photo._id]: e.target.value }))}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleAddComment(photo._id);
-                                }
-                            }}
-                        />
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => handleAddComment(photo._id)}
-                            disabled={!commentTexts[photo._id] || !commentTexts[photo._id].trim()}
-                        >
-                            Send
-                        </Button>
-                    </Box>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center' }}>
+                        <TextField placeholder="Viết bình luận..." variant="outlined" size="small" fullWidth value={commentTexts[photo._id] || ""} onChange={(e) => setCommentTexts(prev => ({ ...prev, [photo._id]: e.target.value }))} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddComment(photo._id); } }} />
+                        <Button variant="contained" color="primary" style={{ minWidth: 80, padding: '8px 12px' }} onClick={() => handleAddComment(photo._id)} disabled={!commentTexts[photo._id] || !commentTexts[photo._id].trim()}>Gửi</Button>
+                    </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 
     // Luôn hiển thị tất cả ảnh (không còn chế độ Advanced Features)
     return (
-        <div className="photos-container">
+        <div style={{ maxWidth: 800, margin: '12px auto', display: 'flex', flexDirection: 'column', gap: 14 }}>
             {photos.map(renderPhoto)}
         </div>
     );
